@@ -14,15 +14,25 @@ export async function POST(req:NextApiRequest) {
     const currentPassword = await Password.find({ date: { $gte: maxDate  } })
 
     if(currentPassword[0]!=null&&currentPassword[0].code==accessKey) {
-        return {
-            authorized: true
-        }
+        return NextResponse.json({
+            message: "Authorized",
+            data: {
+                authorized: true
+            }
+        }, {
+            status: 200
+        });
     }
 
     else{
-        return {
-            authorized: false
-        }
+        return NextResponse.json({
+            message: "Unauthorized",
+            data: {
+                authorized: false
+            }
+        }, {
+            status: 401
+        });
     }
 
 }
