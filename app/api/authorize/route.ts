@@ -2,8 +2,9 @@ import mongoose from 'mongoose';
 
 import Password from '@/entitites/Password';
 import { uri } from '@/env';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req:NextApiRequest) {
+export async function POST(req:NextRequest) {
     
     await mongoose.connect(uri);
 
@@ -14,25 +15,15 @@ export async function POST(req:NextApiRequest) {
     const currentPassword = await Password.find({ date: { $gte: maxDate  } })
 
     if(currentPassword[0]!=null&&currentPassword[0].code==accessKey) {
-        return NextResponse.json({
-            message: "Authorized",
-            data: {
-                authorized: true
-            }
-        }, {
-            status: 200
-        });
+        return {
+            authorized: true
+        }
     }
 
     else{
-        return NextResponse.json({
-            message: "Unauthorized",
-            data: {
-                authorized: false
-            }
-        }, {
-            status: 401
-        });
+        return {
+            authorized: false
+        }
     }
 
 }
