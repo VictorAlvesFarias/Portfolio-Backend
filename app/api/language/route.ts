@@ -2,7 +2,6 @@ import Language from '@/entitites/Language';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 import { uri } from '../../../env';
-import LoginService from '@/services/LoginService';
 import login from '@/app/[path]/login/page';
 import { verify } from '../../../extensions/validate';
 
