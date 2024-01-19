@@ -2,7 +2,6 @@ import Language from '@/entitites/Language';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 import { uri } from '../../../env';
-import login from '@/app/[path]/login/page';
 import { verify } from '../../../extensions/validate';
 
 export async function POST(req: NextRequest) {
