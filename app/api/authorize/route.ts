@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import Password from '@/entitites/Password';
 import { uri } from '@/env';
 
-export async function verify(req:any) {
+export async function POST(req:NextApiRequest) {
     
     await mongoose.connect(uri);
 
-    const { accessKey } = await req;
+    const { accessKey } = await req.json();
 
     const maxDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
