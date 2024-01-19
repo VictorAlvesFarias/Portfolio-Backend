@@ -1,6 +1,5 @@
 import Profile from '@/entitites/Profile';
 import { uri } from '@/env';
-import { Authorize } from '@/extensions/Auth';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
