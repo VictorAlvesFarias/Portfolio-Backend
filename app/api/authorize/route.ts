@@ -16,7 +16,7 @@ export async function POST(req:NextRequest) {
 
     if(currentPassword[0]!=null&&currentPassword[0].code==accessKey) {
         return NextResponse.json({
-            message: "Unauthorized",
+            message: "Authorized",
             data: {
                 authorized: true
             }
