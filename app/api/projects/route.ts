@@ -63,26 +63,10 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const authHeader = req.headers.get('auth');
-    if (await verify(authHeader)) {
-        try {
-            await mongoose.connect(uri);
 
-            const projects = await Project.find({})
-        
-            return NextResponse.json(projects);
-        } catch (e) {
-            return NextResponse.json({
-                message: e
-            }, {
-                status: 400
-            });
-        }
-    } else {
-        return NextResponse.json({
-            message: "Unauthorized"
-        }, {
-            status: 401
-        });
-    }
+    await mongoose.connect(uri);
+
+    const projects = await Project.find({})
+
+    return NextResponse.json(projects);
 }

@@ -5,7 +5,6 @@ import { uri } from '../../../env';
 import { verify } from '../../../extensions/validate';
 
 export async function POST(req: NextRequest) {
-
     const authHeader:any = req.headers.get('auth');
 
     if (await verify(authHeader)) {
@@ -65,21 +64,10 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const authHeader = req.headers.get('auth');
-    
-    if (await verify(authHeader)) {
+    await mongoose.connect(uri);
 
-            await mongoose.connect(uri);
+    const languages = await Language.find({})
 
-            const languages = await Language.find({})
-        
-            return NextResponse.json(languages);
-    }
-    else {
-        return NextResponse.json({
-            message: "Unauthorized"
-        }, {
-            status: 401
-        });
-    }
+    return NextResponse.json(languages);
+
 }
