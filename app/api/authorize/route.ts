@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-
 import Password from '@/entitites/Password';
 import { uri } from '@/env';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req:NextRequest) {
-    
+
     await mongoose.connect(uri);
 
     const { accessKey } = await req.json();
@@ -37,4 +36,5 @@ export async function POST(req:NextRequest) {
     }
 
 }
+
 

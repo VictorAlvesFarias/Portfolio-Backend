@@ -6,6 +6,7 @@ import Password from '@/entitites/Password';
 import { randomUUID } from 'crypto';
 
 export async function POST(req: NextRequest) {
+
     await mongoose.connect(uri);
 
     const { password } = await req.json();
@@ -41,7 +42,6 @@ export async function POST(req: NextRequest) {
     }
 
     else {
-
         return NextResponse.json({
             message: ""
         }, {
@@ -49,4 +49,6 @@ export async function POST(req: NextRequest) {
         })
     }
 }
+
+
 
