@@ -14,7 +14,7 @@ function sum(range:any) {
 
 async function getRepositories(username:string) {
     try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`);
+        const response = await fetch(`https://api.github.com/users/${username}/repos`,{ cache: 'no-store' });
         return await response.json();
     } catch (error) {
         throw error;
@@ -23,7 +23,7 @@ async function getRepositories(username:string) {
 
 async function getLanguagesForRepository(username:string, repoName:string) {
     try {
-        const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/languages`);
+        const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/languages`,{ cache: 'no-store' });
         return await response.json();
     } catch (error) {
         throw error;
