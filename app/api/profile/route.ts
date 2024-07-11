@@ -99,8 +99,6 @@ function newPostIsValid(date1Obj:string) {
 }
 
 export async function GET() {
-
-
     await mongoose.connect(uri);
     
     const item =  await Profile.findOne({}).sort({ date: -1 })
