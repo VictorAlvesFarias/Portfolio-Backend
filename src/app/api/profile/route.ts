@@ -1,5 +1,5 @@
 import Profile from '@/entitites/Profile';
-import { uri } from '@/env';
+import { uri } from '@/../env';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
