@@ -3,36 +3,36 @@ import { uri } from '@/../env';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
-function sum(range:any) {
+function sum(range: any) {
     let value = 0
     console.log(range)
-    range.forEach((i:any) => {
-        value =+ i.percentage
+    range.forEach((i: any) => {
+        value = + i.percentage
     });
     return value
 }
 
-async function getRepositories(username:string) {
+async function getRepositories(username: string) {
     try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`,{ cache: 'no-store' });
+        const response = await fetch(`https://api.github.com/users/${username}/repos`, { cache: 'no-store' });
         return await response.json();
     } catch (error) {
         throw error;
     }
 }
 
-async function getLanguagesForRepository(username:string, repoName:string) {
+async function getLanguagesForRepository(username: string, repoName: string) {
     try {
-        const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/languages`,{ cache: 'no-store' });
+        const response = await fetch(`https://api.github.com/repos/${username}/${repoName}/languages`, { cache: 'no-store' });
         return await response.json();
     } catch (error) {
         throw error;
     }
 }
 
-async function calculateLanguagePercentage(username:string) {
+async function calculateLanguagePercentage(username: string) {
     const repositories = await getRepositories(username);
-    const languageStats:any = {};
+    const languageStats: any = {};
 
     for (let index = 0; index < repositories.length; index++) {
 
@@ -40,96 +40,111 @@ async function calculateLanguagePercentage(username:string) {
 
         for (const lang in languages) {
 
-            if(languageStats[lang])
-            languageStats[lang] += languages[lang];
+            if (languageStats[lang])
+                languageStats[lang] += languages[lang];
 
             else
-            languageStats[lang] = languages[lang]
+                languageStats[lang] = languages[lang]
         }
     };
-    const languagePercentage:any = {};
+    const languagePercentage: any = {};
 
-    const totalLines:any = Object.values(languageStats).reduce((acc:any, val:any) => acc + val, 0);
+    const totalLines: any = Object.values(languageStats).reduce((acc: any, val: any) => acc + val, 0);
 
     for (const lang in languageStats) {
-      languagePercentage[lang] = (languageStats[lang] / totalLines) * 100;
+        languagePercentage[lang] = (languageStats[lang] / totalLines) * 100;
     }
 
-    const response = Object.keys(languagePercentage).map(nomedachave => {console.log(nomedachave);return ({
-        name: nomedachave,
-        percentage: languagePercentage[nomedachave]
-    })});
+    const response = Object.keys(languagePercentage).map(nomedachave => {
+        console.log(nomedachave); return ({
+            name: nomedachave,
+            percentage: languagePercentage[nomedachave]
+        })
+    });
 
     response.push({
-        name:"Others",
-        percentage: sum(response.filter( (item:any)=> item.percentage < 5))
-    }) 
-
-    return  response.filter((item:any)=>(item.percentage > 5||item.name=="Others"));
-}
-
-async function getPorcentages(username:string) {
-    return await calculateLanguagePercentage(username)
-    .then((result) => {
-    const languageArray = result
-
-    languageArray.sort((a, b) => b.percentage - a.percentage);
-
-        return languageArray
+        name: "Others",
+        percentage: sum(response.filter((item: any) => item.percentage < 5))
     })
-    .catch((error) => {
-    console.error('Ocorreu um erro:', error);
-    });
+
+    return response.filter((item: any) => (item.percentage > 5 || item.name == "Others"));
 }
 
-function newPostIsValid(date1Obj:string) {
-  const date_1: any = new Date(new Date().toISOString())
+async function getPorcentages(username: string) {
+    return await calculateLanguagePercentage(username)
+        .then((result) => {
+            const languageArray = result
 
-  const date_2: any = new Date(date1Obj)
+            languageArray.sort((a, b) => b.percentage - a.percentage);
 
-  const timeDifference = Math.abs(date_1- date_2);
+            return languageArray
+        })
+        .catch((error) => {
+            console.error('Ocorreu um erro:', error);
+        });
+}
 
-  const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+function newPostIsValid(date1Obj: string) {
+    const date_1: any = new Date(new Date().toISOString()).getTime()
 
-  if (timeDifference > oneWeekInMilliseconds) {
-    return true;
-  } else {
-    return false;
-  }
+    const date_2: any = new Date(date1Obj).getTime()
+
+    const timeDifference = date_1 - date_2;
+
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+    console.log(
+        "Database date:" + date1Obj,
+        "Currente tick:" + date_1,
+        "Database tick:" + date_2,
+        "Diference tick:" + timeDifference,
+        "Week tick:" + oneWeekInMilliseconds
+    )
+    if (timeDifference > oneWeekInMilliseconds) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 export async function GET() {
-    await mongoose.connect(uri);
-    
-    const item =  await Profile.findOne({}).sort({ date: -1 })
+    try {
 
-    if (item == null) {
-        const data = await getPorcentages("victoralvesfarias")
+        console.log("Enter endpoint")
+        await mongoose.connect(uri);
 
-        const p = new Profile({
-            languages:data,
-            date: new Date().toISOString()
-        });
-        const save = await p.save()
-        await mongoose.connection.close();
-        return NextResponse.json(save);
-    } 
+        const item = await Profile.findOne({}).sort({ date: -1 })
+        console.log("Item founded:" + JSON.stringify(item))
 
-    else if(newPostIsValid(item.date)) {
-        const data = await getPorcentages("victoralvesfarias")
+        if (item == null) {
+            const data = await getPorcentages("victoralvesfarias")
 
-        const p = new Profile({
-            languages:data,
-            date: new Date().toISOString()
-        });
-        await p.save()
-        await mongoose.connection.close();
-        return NextResponse.json(p);
-    }
-    
-    else {
-        await mongoose.connection.close();
-        return NextResponse.json(item);
+            const p = new Profile({
+                languages: data,
+                date: new Date().toISOString()
+            });
+            const save = await p.save()
+            await mongoose.connection.close();
+            return NextResponse.json(save);
+        }
+
+        else if (newPostIsValid(item.date)) {
+            const data = await getPorcentages("victoralvesfarias")
+
+            const p = new Profile({
+                languages: data,
+                date: new Date().toISOString()
+            });
+            await p.save()
+            await mongoose.connection.close();
+            return NextResponse.json(p);
+        }
+
+        else {
+            await mongoose.connection.close();
+            return NextResponse.json(item);
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 
